@@ -12,6 +12,9 @@ nlp = spacy.load("es_core_news_md")
 # Expresión regular para correos electrónicos
 patron_email = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
 
+# Expresión regular para capturar números dentro de direcciones
+patron_numero = r"\b\d+\b"
+
 # Variable para almacenar el último resultado
 ultimo_resultado = []
 
@@ -25,18 +28,25 @@ def procesar_texto():
     doc = nlp(texto)
     resultado = []
 
+    # Buscar correos electrónicos antes de analizar entidades
+    correos = re.findall(patron_email, texto)
+
     for ent in doc.ents:
         if ent.label_ == "ORG":  # Empresas
-            resultado.append({"Empresa": ent.text, "Dirección": "", "Correo Electrónico": "", "Nombre": ""})
+            resultado.append({"Empresa": ent.text, "Dirección": "", "Número": "", "Correo Electrónico": "", "Nombre": ""})
         elif ent.label_ in ["LOC", "FAC"]:  # Ubicaciones y direcciones
             if resultado:
                 resultado[-1]["Dirección"] = ent.text
+                # Extraer número dentro de la dirección
+                numero_encontrado = re.findall(patron_numero, ent.text)
+                resultado[-1]["Número"] = numero_encontrado[0] if numero_encontrado else ""
         elif ent.label_ == "PERSON":  # Nombres de personas
             if resultado:
                 resultado[-1]["Nombre"] = ent.text
-        elif re.match(patron_email, ent.text):  # Correos electrónicos
-            if resultado:
-                resultado[-1]["Correo Electrónico"] = ent.text
+
+    # Agregar correos electrónicos a la última entrada en el resultado
+    if correos and resultado:
+        resultado[-1]["Correo Electrónico"] = ", ".join(correos)  # Guarda varios correos si hay más de uno
 
     ultimo_resultado = resultado  # Guardar resultado para futuras consultas
     return jsonify(resultado)
