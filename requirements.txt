@@ -1,7 +1,5 @@
-Flask==2.2.5
-Flask-CORS==3.0.10
-spacy==3.5.3
-pandas==1.5.3
-gunicorn==20.1.0  
-requests==2.31.0 
-es_core_news_md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.4.0/es_core_news_md-3.4.0.tar.gz
+Flask==2.2.2
+flask-cors==3.0.10
+spacy==3.5.4
+es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.5.0/es_core_news_md-3.5.0.tar.gz
+
