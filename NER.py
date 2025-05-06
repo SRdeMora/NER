@@ -26,12 +26,15 @@ def procesar_texto():
     resultado = []
 
     for ent in doc.ents:
-        if ent.label_ == "ORG":
-            resultado.append({"Empresa": ent.text, "Dirección": "", "Correo Electrónico": ""})
-        elif ent.label_ == "LOC":
+        if ent.label_ == "ORG":  # Empresas
+            resultado.append({"Empresa": ent.text, "Dirección": "", "Correo Electrónico": "", "Nombre": ""})
+        elif ent.label_ in ["LOC", "FAC"]:  # Ubicaciones y direcciones
             if resultado:
                 resultado[-1]["Dirección"] = ent.text
-        elif re.match(patron_email, ent.text):
+        elif ent.label_ == "PERSON":  # Nombres de personas
+            if resultado:
+                resultado[-1]["Nombre"] = ent.text
+        elif re.match(patron_email, ent.text):  # Correos electrónicos
             if resultado:
                 resultado[-1]["Correo Electrónico"] = ent.text
 
