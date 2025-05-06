@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Extracción de Entidades con spaCy</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        textarea { width: 60%; height: 100px; margin-bottom: 10px; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #00796b; color: white; }
+        button { background-color: #00796b; color: white; padding: 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>Extracción de Entidades con spaCy</h1>
+    <textarea id="texto" placeholder="Introduce un texto aquí..."></textarea><br>
+    <button onclick="procesarTexto()">Procesar Texto</button>
+    <button onclick="limpiarTabla()">Limpiar Tabla</button>
+
+    <table id="resultado">
+        <thead>
+            <tr>
+                <th>Empresa</th>
+                <th>Dirección</th>
+                <th>Correo Electrónico</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function procesarTexto() {
+            const texto = document.getElementById("texto").value;
+            const respuesta = await fetch("http://localhost:5000/procesar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ texto })
+            });
+            const datos = await respuesta.json();
+            actualizarTabla(datos);
+        }
+
+        function actualizarTabla(datos) {
+            const tbody = document.querySelector("#resultado tbody");
+            tbody.innerHTML = "";
+            datos.forEach(item => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `<td>${item.Empresa}</td><td>${item.Dirección}</td><td>${item["Correo Electrónico"]}</td>`;
+                tbody.appendChild(fila);
+            });
+        }
+
+        function limpiarTabla() {
+            document.getElementById("texto").value = "";
+            document.querySelector("#resultado tbody").innerHTML = "";
+        }
+    </script>
+
+</body>
+</html>
