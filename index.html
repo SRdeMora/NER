@@ -9,7 +9,7 @@
         table { width: 80%; margin: 20px auto; border-collapse: collapse; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #00796b; color: white; }
-        button { background-color: #00796b; color: white; padding: 10px; border: none; cursor: pointer; }
+        button { background-color: #00796b; color: white; padding: 10px; border: none; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body>
@@ -17,6 +17,7 @@
     <h1>Extracción de Entidades con spaCy</h1>
     <textarea id="texto" placeholder="Introduce un texto aquí..."></textarea><br>
     <button onclick="procesarTexto()">Procesar Texto</button>
+    <button onclick="obtenerUltimo()">Obtener Último Resultado</button>
     <button onclick="limpiarTabla()">Limpiar Tabla</button>
 
     <table id="resultado">
@@ -31,23 +32,54 @@
     </table>
 
     <script>
+        const API_URL = "https://TU-BACKEND-EN-RENDER.com"; // Reemplázalo con la URL de tu backend en Render
+
         async function procesarTexto() {
             const texto = document.getElementById("texto").value;
-            const respuesta = await fetch("http://localhost:5000/procesar", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ texto })
-            });
-            const datos = await respuesta.json();
-            actualizarTabla(datos);
+            if (!texto.trim()) {
+                alert("Introduce un texto para procesar.");
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`${API_URL}/procesar`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ texto })
+                });
+                const datos = await respuesta.json();
+                actualizarTabla(datos);
+            } catch (error) {
+                console.error("Error procesando texto:", error);
+                alert("Hubo un error al procesar el texto.");
+            }
+        }
+
+        async function obtenerUltimo() {
+            try {
+                const respuesta = await fetch(`${API_URL}/ultimo`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" }
+                });
+                const datos = await respuesta.json();
+                actualizarTabla(datos);
+            } catch (error) {
+                console.error("Error obteniendo último resultado:", error);
+                alert("Hubo un error al obtener el último resultado.");
+            }
         }
 
         function actualizarTabla(datos) {
             const tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = "";
+            if (datos.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='3'>No se encontraron entidades.</td></tr>";
+                return;
+            }
+
             datos.forEach(item => {
                 const fila = document.createElement("tr");
-                fila.innerHTML = `<td>${item.Empresa}</td><td>${item.Dirección}</td><td>${item["Correo Electrónico"]}</td>`;
+                fila.innerHTML = `<td>${item.Empresa || "-"}</td><td>${item.Dirección || "-"}</td><td>${item["Correo Electrónico"] || "-"}</td>`;
                 tbody.appendChild(fila);
             });
         }
