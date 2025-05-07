@@ -9,14 +9,14 @@ CORS(app)  # Permitir solicitudes desde el frontend
 # Cargar modelo de spaCy en español
 nlp = spacy.load("es_core_news_md")
 
+# Expresión regular mejorada para direcciones con número
+patron_direccion = r"\b(?:calle|avenida|av\.|c\.|cll\.|carrera|cra\.|cr\.|pasaje|psje\.|boulevard|blvd\.|plaza|plz\.)\s+\D*?\s?\d+\b"
+
 # Expresión regular para correos electrónicos
-patron_email = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+patron_email = r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"
 
 # Expresión regular para números de teléfono
 patron_telefono = r"\+?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{3,4}[-.\s]?\d{3,4}"
-
-# Expresión regular para direcciones con nombres de calles y números
-patron_direccion = r"\b(?:calle|avenida|av\.|c\.|cll\.|carrera|cra\.|cr\.|pasaje|psje\.|boulevard|blvd\.|plaza|plz\.)\s+\D*?\s?\d+\b"
 
 @app.route("/procesar", methods=["POST"])
 def procesar_texto():
@@ -35,9 +35,9 @@ def procesar_texto():
         if ent.label_ == "ORG":  # Empresas
             resultado["Empresa"] = ent.text
         elif ent.label_ in ["LOC", "FAC"]:  # Direcciones o ubicaciones
-            if any(word in ent.text.lower() for word in ["calle", "avenida", "plaza"]):  
-                resultado["Dirección"] = ent.text  # Guarda solo direcciones con nombres de calles
-            elif resultado["Ciudad"] == "":  # Guarda la ciudad si aún no ha sido asignada
+            if re.match(patron_direccion, ent.text):  # Filtrar direcciones con número
+                resultado["Dirección"] = ent.text  
+            elif resultado["Ciudad"] == "":  # Guardar la ciudad si aún no ha sido asignada
                 resultado["Ciudad"] = ent.text  
 
     # Asociar correos electrónicos y teléfonos
