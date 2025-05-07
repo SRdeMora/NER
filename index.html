@@ -17,7 +17,6 @@
     <h1>Extracción de Entidades con spaCy</h1>
     <textarea id="texto" placeholder="Introduce un texto aquí..."></textarea><br>
     <button onclick="procesarTexto()">Procesar Texto</button>
-    <button onclick="obtenerUltimo()">Obtener Último Resultado</button>
     <button onclick="limpiarTabla()">Limpiar Tabla</button>
 
     <table id="resultado">
@@ -25,9 +24,8 @@
             <tr>
                 <th>Empresa</th>
                 <th>Dirección</th>
-                <th>Número</th>
+                <th>CEO</th>
                 <th>Correo Electrónico</th>
-                <th>Nombre</th>
                 <th>Teléfono</th>
             </tr>
         </thead>
@@ -35,7 +33,7 @@
     </table>
 
     <script>
-        const API_URL = "https://ner-va9r.onrender.com"; // Reemplázalo con la URL de tu backend en Render
+        const API_URL = "https://ner-va9r.onrender.com"; // Reemplázalo con la URL de tu backend
 
         async function procesarTexto() {
             const texto = document.getElementById("texto").value;
@@ -58,46 +56,24 @@
             }
         }
 
-        async function obtenerUltimo() {
-            try {
-                const respuesta = await fetch(`${API_URL}/ultimo`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" }
-                });
-                const datos = await respuesta.json();
-                actualizarTabla(datos);
-            } catch (error) {
-                console.error("Error obteniendo último resultado:", error);
-                alert("Hubo un error al obtener el último resultado.");
-            }
-        }
-
         function actualizarTabla(datos) {
             const tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = "";
 
-            // Verificar si datos es un objeto en lugar de una lista
-            if (!Array.isArray(datos)) {
-                datos = [datos]; // Convertir a lista si es un objeto
-            }
-
-            if (datos.length === 0 || !datos[0].Empresa) {
-                tbody.innerHTML = "<tr><td colspan='6'>No se encontraron entidades.</td></tr>";
+            if (!datos || !datos.Empresa) {
+                tbody.innerHTML = "<tr><td colspan='5'>No se encontraron entidades.</td></tr>";
                 return;
             }
 
-            datos.forEach(item => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td>${item.Empresa || "-"}</td>
-                    <td>${item.Dirección || "-"}</td>
-                    <td>${item.Número || "-"}</td>
-                    <td>${item["Correo Electrónico"] || "-"}</td>
-                    <td>${item.Nombre || "-"}</td>
-                    <td>${item.Teléfono || "-"}</td>
-                `;
-                tbody.appendChild(fila);
-            });
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+                <td>${datos.Empresa || "-"}</td>
+                <td>${datos.Dirección || "-"}</td>
+                <td>${datos.CEO || "-"}</td>
+                <td>${datos["Correo Electrónico"] || "-"}</td>
+                <td>${datos.Teléfono || "-"}</td>
+            `;
+            tbody.appendChild(fila);
         }
 
         function limpiarTabla() {
