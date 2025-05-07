@@ -24,21 +24,29 @@ def procesar_texto():
     texto = datos.get("texto", "")
 
     doc = nlp(texto)
-    resultado = {"Empresa": "", "Dirección": "", "Ciudad": "", "Correo Electrónico": "", "Teléfono": ""}
+    resultado = {
+        "Empresa": "", 
+        "Dirección": "", 
+        "Ciudad": "", 
+        "Correo Electrónico": "", 
+        "Teléfono": ""
+    }
 
     # Buscar correos electrónicos, números de teléfono y direcciones con regex
     correos = re.findall(patron_email, texto)
     telefonos = re.findall(patron_telefono, texto)
     direcciones = re.findall(patron_direccion, texto)
 
+    # Capturar dirección si se encuentra
+    if direcciones:
+        resultado["Dirección"] = direcciones[0]  
+
     for ent in doc.ents:
         if ent.label_ == "ORG":  # Empresas
             resultado["Empresa"] = ent.text
-        elif ent.label_ in ["LOC", "FAC"]:  # Direcciones o ubicaciones
-            if re.match(patron_direccion, ent.text):  # Filtrar direcciones con número
-                resultado["Dirección"] = ent.text  
-            elif resultado["Ciudad"] == "":  # Guardar la ciudad si aún no ha sido asignada
-                resultado["Ciudad"] = ent.text  
+        elif ent.label_ == "LOC" or ent.label_ == "GPE":  # Ubicaciones (ciudades)
+            if resultado["Ciudad"] == "":  # Solo asignar si aún no se ha detectado
+                resultado["Ciudad"] = ent.text
 
     # Asociar correos electrónicos y teléfonos
     resultado["Correo Electrónico"] = ", ".join(correos) if correos else "-"
