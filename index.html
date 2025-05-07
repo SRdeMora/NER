@@ -25,7 +25,9 @@
             <tr>
                 <th>Empresa</th>
                 <th>Dirección</th>
+                <th>Número</th>
                 <th>Correo Electrónico</th>
+                <th>Nombre</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -73,13 +75,13 @@
             const tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = "";
             if (datos.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='3'>No se encontraron entidades.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5'>No se encontraron entidades.</td></tr>";
                 return;
             }
 
             datos.forEach(item => {
                 const fila = document.createElement("tr");
-                fila.innerHTML = `<td>${item.Empresa || "-"}</td><td>${item.Dirección || "-"}</td><td>${item["Correo Electrónico"] || "-"}</td>`;
+                fila.innerHTML = `<td>${item.Empresa || "-"}</td><td>${item.Dirección || "-"}</td><td>${item.Número || "-"}</td><td>${item["Correo Electrónico"] || "-"}</td><td>${item.Nombre || "-"}</td>`;
                 tbody.appendChild(fila);
             });
         }
