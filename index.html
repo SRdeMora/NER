@@ -15,7 +15,9 @@
 <body>
 
     <h1>Extracción de Entidades con spaCy</h1>
-    <textarea id="texto" placeholder="Introduce un texto aquí..."></textarea><br>
+    <textarea id="texto" placeholder="ej: La empresa InnovaTech ha inaugurado una nueva sede en Madrid, ubicada en Calle Mayor 45.
+Para más información, los clientes pueden escribir a contacto@innovatech.com.También pueden llamar al número +34 912 345 678 para consultas.
+ "></textarea><br>
     <button onclick="procesarTexto()">Procesar Texto</button>
     <button onclick="limpiarTabla()">Limpiar Tabla</button>
 
@@ -60,7 +62,7 @@
             const tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = "";
 
-            if (!datos || !datos.Empresa) {
+            if (!datos || (!datos.Dirección && !datos.Ciudad)) {
                 tbody.innerHTML = "<tr><td colspan='5'>No se encontraron entidades.</td></tr>";
                 return;
             }
