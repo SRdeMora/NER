@@ -35,8 +35,10 @@ def procesar_texto():
         if ent.label_ == "ORG":  # Empresas
             resultado["Empresa"] = ent.text
         elif ent.label_ in ["LOC", "FAC"]:  # Direcciones o ubicaciones
-            resultado["Dirección"] = ent.text if any(word in ent.text.lower() for word in ["calle", "avenida", "plaza"]) else resultado["Dirección"]
-            resultado["Ciudad"] = ent.text if resultado["Dirección"] and resultado["Ciudad"] == "" else resultado["Ciudad"]
+            if any(word in ent.text.lower() for word in ["calle", "avenida", "plaza"]):  
+                resultado["Dirección"] = ent.text  # Guarda solo direcciones con nombres de calles
+            elif resultado["Ciudad"] == "":  # Guarda la ciudad si aún no ha sido asignada
+                resultado["Ciudad"] = ent.text  
 
     # Asociar correos electrónicos y teléfonos
     resultado["Correo Electrónico"] = ", ".join(correos) if correos else "-"
