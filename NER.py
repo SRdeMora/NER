@@ -18,49 +18,32 @@ patron_telefono = r"\+?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{3,4}[-.\s]?\d{3,4}"
 # Expresión regular para direcciones con nombres de calles y números
 patron_direccion = r"\b(?:calle|avenida|av\.|c\.|cll\.|carrera|cra\.|cr\.|pasaje|psje\.|boulevard|blvd\.|plaza|plz\.)\s+\D*?\s?\d+\b"
 
-# Variable para almacenar el último resultado
-ultimo_resultado = []
-
 @app.route("/procesar", methods=["POST"])
 def procesar_texto():
-    global ultimo_resultado  # Guardar el último resultado
-
     datos = request.json
     texto = datos.get("texto", "")
 
     doc = nlp(texto)
-    resultado = []
+    resultado = {"Empresa": "", "Dirección": "", "CEO": "", "Correo Electrónico": "", "Teléfono": ""}
 
-    # Buscar correos electrónicos y números de teléfono antes de analizar entidades
+    # Buscar correos electrónicos, números de teléfono y direcciones con regex
     correos = re.findall(patron_email, texto)
     telefonos = re.findall(patron_telefono, texto)
-    direcciones = re.findall(patron_direccion, texto)
+    direcciones = re.findall(patron_direccion, texto,re.IGNORECASE)
 
     for ent in doc.ents:
         if ent.label_ == "ORG":  # Empresas
-            resultado.append({"Empresa": ent.text, "Dirección": "", "Número": "", "Correo Electrónico": "", "Nombre": "", "Teléfono": ""})
-        elif ent.label_ == "PERSON":  # Nombres de personas
-            if resultado:
-                resultado[-1]["Nombre"] = ent.text
+            resultado["Empresa"] = ent.text
+        elif ent.label_ in ["LOC", "FAC"]:  # Direcciones o ubicaciones
+            resultado["Dirección"] = ent.text
+        elif ent.label_ == "PERSON":  # CEO (nombre de la persona)
+            resultado["CEO"] = ent.text
 
-    # Agregar direcciones extraídas por regex
-    if direcciones and resultado:
-        resultado[-1]["Dirección"] = ", ".join(direcciones)
+    # Asociar correos electrónicos y teléfonos
+    resultado["Correo Electrónico"] = ", ".join(correos) if correos else "-"
+    resultado["Teléfono"] = ", ".join(telefonos) if telefonos else "-"
 
-    # Agregar correos electrónicos
-    if correos and resultado:
-        resultado[-1]["Correo Electrónico"] = ", ".join(correos)  
-
-    # Agregar números de teléfono
-    if telefonos and resultado:
-        resultado[-1]["Teléfono"] = ", ".join(telefonos)
-
-    ultimo_resultado = resultado  # Guardar resultado para futuras consultas
     return jsonify(resultado)
-
-@app.route("/ultimo", methods=["GET"])
-def obtener_ultimo():
-    return jsonify(ultimo_resultado)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
