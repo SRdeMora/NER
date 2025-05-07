@@ -28,6 +28,7 @@
                 <th>Número</th>
                 <th>Correo Electrónico</th>
                 <th>Nombre</th>
+                <th>Teléfono</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -74,14 +75,27 @@
         function actualizarTabla(datos) {
             const tbody = document.querySelector("#resultado tbody");
             tbody.innerHTML = "";
-            if (datos.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='5'>No se encontraron entidades.</td></tr>";
+
+            // Verificar si datos es un objeto en lugar de una lista
+            if (!Array.isArray(datos)) {
+                datos = [datos]; // Convertir a lista si es un objeto
+            }
+
+            if (datos.length === 0 || !datos[0].Empresa) {
+                tbody.innerHTML = "<tr><td colspan='6'>No se encontraron entidades.</td></tr>";
                 return;
             }
 
             datos.forEach(item => {
                 const fila = document.createElement("tr");
-                fila.innerHTML = `<td>${item.Empresa || "-"}</td><td>${item.Dirección || "-"}</td><td>${item.Número || "-"}</td><td>${item["Correo Electrónico"] || "-"}</td><td>${item.Nombre || "-"}</td>`;
+                fila.innerHTML = `
+                    <td>${item.Empresa || "-"}</td>
+                    <td>${item.Dirección || "-"}</td>
+                    <td>${item.Número || "-"}</td>
+                    <td>${item["Correo Electrónico"] || "-"}</td>
+                    <td>${item.Nombre || "-"}</td>
+                    <td>${item.Teléfono || "-"}</td>
+                `;
                 tbody.appendChild(fila);
             });
         }
