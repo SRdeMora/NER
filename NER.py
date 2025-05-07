@@ -33,9 +33,9 @@ def procesar_texto():
     }
 
     # Buscar correos electrónicos, números de teléfono y direcciones con regex
-    correos = re.findall(patron_email, texto)
+    correos = re.findall(patron_email, texto,re.IGNORECASE)
     telefonos = re.findall(patron_telefono, texto)
-    direcciones = re.findall(patron_direccion, texto)
+    direcciones = re.findall(patron_direccion, texto,re.IGNORECASE)
 
     # Capturar dirección si se encuentra
     if direcciones:
