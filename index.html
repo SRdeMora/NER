@@ -10,14 +10,30 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #00796b; color: white; }
         button { background-color: #00796b; color: white; padding: 10px; border: none; cursor: pointer; margin: 5px; }
+        .ejemplo-texto { background-color: #f0f0f0; padding: 10px; margin: 10px auto; width: 60%; text-align: left; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <h1>Extracción de Entidades con spaCy</h1>
-    <textarea id="texto" placeholder="ej: La empresa InnovaTech ha inaugurado una nueva sede en Madrid, ubicada en Calle Mayor 45.
-Para más información, los clientes pueden escribir a contacto@innovatech.com.También pueden llamar al número +34 912 345 678 para consultas.
- "></textarea><br>
+    
+    <h3>Ejemplos de texto para probar:</h3>
+    <div class="ejemplo-texto">
+        <p id="ejemplo1">La empresa TechGlobal ha abierto una nueva oficina en Barcelona, ubicada en Avenida Diagonal 200. Para más información, los clientes pueden escribir a info@techglobal.com. También pueden llamar al número +34 933 456 789 para consultas.</p>
+        <button onclick="copiarTexto('ejemplo1')">Copiar</button>
+    </div>
+
+    <div class="ejemplo-texto">
+        <p id="ejemplo2">La empresa InnovaSoft ha inaugurado una nueva sede en Valencia, situada en Calle Colón 15. Para consultas, los clientes pueden escribir a soporte@innovasoft.com o llamar al número +34 960 123 456.</p>
+        <button onclick="copiarTexto('ejemplo2')">Copiar</button>
+    </div>
+
+    <div class="ejemplo-texto">
+        <p id="ejemplo3">La empresa DataTech Solutions ha expandido sus operaciones con una nueva oficina en Sevilla, ubicada en Calle San Fernando 22. Los clientes pueden obtener más información enviando un correo a contacto@datatech.com o llamando al número +34 954 678 910.</p>
+        <button onclick="copiarTexto('ejemplo3')">Copiar</button>
+    </div>
+
+    <textarea id="texto" placeholder="Introduce un texto aquí..."></textarea><br>
     <button onclick="procesarTexto()">Procesar Texto</button>
     <button onclick="limpiarTabla()">Limpiar Tabla</button>
 
@@ -81,6 +97,15 @@ Para más información, los clientes pueden escribir a contacto@innovatech.com.T
         function limpiarTabla() {
             document.getElementById("texto").value = "";
             document.querySelector("#resultado tbody").innerHTML = "";
+        }
+
+        function copiarTexto(id) {
+            const textoEjemplo = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(textoEjemplo).then(() => {
+                alert("Texto copiado al portapapeles.");
+            }).catch(err => {
+                console.error("Error al copiar texto:", err);
+            });
         }
     </script>
 
